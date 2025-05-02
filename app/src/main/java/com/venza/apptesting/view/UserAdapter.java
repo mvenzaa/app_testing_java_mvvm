@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.venza.apptesting.R;
 import com.venza.apptesting.model.UserModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -15,10 +16,32 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
-    private List<UserModel> userModels;
+    private List<UserModel> userModels = new ArrayList<>();
+    private List<UserModel> allUserModels = new ArrayList<>();
+    private final OnUserClickListener listener;
+
+    public UserAdapter(OnUserClickListener listener) {
+        this.listener = listener;
+    }
 
     public void setData(List<UserModel> userModels) {
         this.userModels = userModels;
+        this.allUserModels = userModels;
+        notifyDataSetChanged();
+    }
+
+    public void filter(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            userModels = new ArrayList<>(allUserModels);
+        } else {
+            List<UserModel> filteredList = new ArrayList<>();
+            for (UserModel userModel : allUserModels) {
+                if (userModel.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                    filteredList.add(userModel);
+                }
+            }
+            userModels = filteredList;
+        }
         notifyDataSetChanged();
     }
 
@@ -31,10 +54,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull UserAdapter.UserViewHolder holder, int position) {
-        holder.textViewUserId.setText(userModels.get(position).getUserId());
-        holder.textViewId.setText(userModels.get(position).getId());
+        holder.textViewUserId.setText(Integer.toString(userModels.get(position).getUserId()));
+        holder.textViewId.setText(Integer.toString(userModels.get(position).getId()));
         holder.textViewTitle.setText(userModels.get(position).getTitle());
         holder.textViewBody.setText(userModels.get(position).getBody());
+        holder.itemView.setOnClickListener(v -> listener.onUserClick(userModels.get(position)));
     }
 
     @Override

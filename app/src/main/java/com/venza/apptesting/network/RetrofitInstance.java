@@ -16,8 +16,4 @@ public class RetrofitInstance {
         }
         return retrofit;
     }
-
-    public static ApiInterface getApiInterface() {
-        return getRetrofitInstance().create(ApiInterface.class);
-    }
 }
